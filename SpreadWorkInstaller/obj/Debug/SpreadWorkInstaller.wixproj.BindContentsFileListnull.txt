@@ -1,0 +1,2 @@
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.exe
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.exe.config

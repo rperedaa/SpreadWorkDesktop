@@ -1,0 +1,7 @@
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkInstaller\bin\Debug\cab1.cab
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkInstaller\bin\Debug\SpreadWorkInstaller.msi
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkInstaller\bin\Debug\SpreadWorkInstaller.wixpdb
+obj\Debug\Product.wixobj
+obj\Debug\SpreadWorkInstaller.wixproj.BindContentsFileListnull.txt
+obj\Debug\SpreadWorkInstaller.wixproj.BindOutputsFileListnull.txt
+obj\Debug\SpreadWorkInstaller.wixproj.BindBuiltOutputsFileListnull.txt

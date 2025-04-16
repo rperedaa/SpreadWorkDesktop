@@ -32,11 +32,15 @@ namespace SpreadWorkDesktop
         float scale = 1;
         int scaleWidth =1;
         int scaleHeight = 1;
+        string Path;
 
 
         
         public Form1()
         {
+            #if DEBUG
+            // System.Diagnostics.Debugger.Launch();
+            #endif
             InitializeComponent();
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
@@ -54,9 +58,8 @@ namespace SpreadWorkDesktop
 
     private void OnElapsedTimeForCapture(object sender, ElapsedEventArgs e)
     {
-           
            // Escribe log
-           // WriteLog("{0} ms elapsed."); 
+           WriteLog("{0} ms elapsed."); 
            // Detener Timer para hacer el proceso
            TimerCaptura.Enabled = false;
            // Si está en el periodo indicado en la configuración
@@ -141,16 +144,20 @@ namespace SpreadWorkDesktop
             PicWidth = cfgGlobal.Get("Width");
             PicHeight =cfgGlobal.Get("Height");
             Percent =cfgGlobal.Get("Percent");
+            Path= cfgGlobal.Get("Folder");
         }
 
         #endregion
 
-    private void SaveScreen(Bitmap bitmap)
+        private void SaveScreen(Bitmap bitmap)
         {
             // Crear directirio para guardar fotos si no existe
-            var path = AppDomain.CurrentDomain.BaseDirectory + "files\\";
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory (path);
+            //var path = AppDomain.CurrentDomain.BaseDirectory + "files\\";
+            var path = Path + "files\\";
+            if (!Directory.Exists(path)) { 
+            DirectoryInfo di = Directory.CreateDirectory(path);
+            di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
             // Nombre de la foto usando tiempo unix
             // var horaunix = DateTime.Now.ToFileTimeUtc().ToString();
             var horaunix =  DateTimeOffset.UtcNow.ToUnixTimeSeconds();
@@ -167,9 +174,12 @@ namespace SpreadWorkDesktop
           try
     {
             
-        var path = AppDomain.CurrentDomain.BaseDirectory;
-        if (!Directory.Exists(path))
-            Directory.CreateDirectory(path);
+        //var path = AppDomain.CurrentDomain.BaseDirectory;
+        var path = Path;
+        if (!Directory.Exists(path)) { 
+                DirectoryInfo di = Directory.CreateDirectory(path);
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+         }
 
         var filePath = String.Format("{0}\\{1}_{2}.txt",
             path,
