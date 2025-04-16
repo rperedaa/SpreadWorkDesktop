@@ -1,4 +1,3 @@
-C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.AssemblyReference.cache
 C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.Form1.resources
 C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.Properties.Resources.resources
 C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.GenerateResource.cache
@@ -8,3 +7,4 @@ C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\Spre
 C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.pdb
 C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.exe
 C:\Users\roberto\source\repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.pdb
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.AssemblyReference.cache
