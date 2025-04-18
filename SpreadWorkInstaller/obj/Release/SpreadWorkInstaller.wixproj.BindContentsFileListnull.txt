@@ -1,4 +1,4 @@
-C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Release\log4net.dll
-C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Release\SpreadWorkDesktop.exe
-C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Release\SpreadWorkDesktop.exe.config
-C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Release\SpreadWorkDesktop.pdb
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\log4net.dll
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.exe
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.exe.config
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.pdb

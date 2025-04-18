@@ -9,6 +9,11 @@
 		<Feature Id="ProductFeature" Title="SpreadWorkInstaller" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
 		</Feature>
+
+		<Property Id="WixShellExecTarget" Value="[#SpreadWorkDesktop.exe]" />
+		
+		
+		
 	</Product>
 
 	<Fragment>
@@ -41,7 +46,22 @@
 					<RegistryValue Type="string" Name="RemoteFilesPath" Value="\\w7pro\fotos\files\" />
 				</RegistryKey>
 			</Component>
+			<Component Id="ApplicationAutostart" Guid="04c28275-ea03-4b16-98e6-af75b66af205">
+				<RegistryValue Root="HKCU" Action="write" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="SpreadWorkDesktop" Value="[INSTALLFOLDER]SpreadWorkDesktop.exe" Type="string"/>
+			</Component>
 		</ComponentGroup>
+
+		<CustomAction Id="LaunchApplication"
+              Execute="immediate"
+              Impersonate="yes"
+              Return="asyncNoWait"
+              FileKey="SpreadWorkDesktop.exe"
+              ExeCommand="" />
+		<InstallExecuteSequence>
+			<Custom Action="LaunchApplication" After="InstallFinalize">NOT Installed</Custom>
+		</InstallExecuteSequence>
+
 	</Fragment>
+	
 	
 </Wix>

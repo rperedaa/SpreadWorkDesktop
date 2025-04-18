@@ -44,6 +44,10 @@ namespace SpreadWorkDesktop
             LoadRegisterConfig();
             SetLogConfig();
             SetRemoteConfig();
+            this.MouseClick += delegate (object sender, MouseEventArgs e)
+            {
+                this.WindowState = FormWindowState.Minimized;
+            };
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -124,26 +128,36 @@ namespace SpreadWorkDesktop
              }
             } 
            else { 
-            log.Info("It's not time configurated to take a screen capture");
+            log.Info("Program not configurated to take a screen capture");
                 // Comprobar si hay que enviar datos 
                 // Si se sobrepasan las fechas de comienzo y fin
-                if (DateTime.Now > StartDateTime && DateTime.Now > EndDateTime){
+                if (DateTime.Now > StartDateTime && DateTime.Now > EndDateTime)
+                {
                     // Si hay datos en el directorio local 
                     int numFiles = CheckForFilesToSend();
                     if (numFiles != 0)
                     {
-                        log.Info("Preparing files to Send: " + numFiles.ToString());
-                        string zipName = GetZipFileName();
-                        CreateZipFile(zipName);
-                        bool result = SendZipFile(zipName);
-                        if (result)
+                        if (CheckRemoteFilesPath())
                         {
-                            DeleteZipAndFiles(zipName);
-                            log.Info("Zip File sent: " + zipName);
+
+                            log.Info("Preparing files to Send: " + numFiles.ToString());
+                            string zipName = GetZipFileName();
+                            CreateZipFile(zipName);
+                            bool result = SendZipFile(zipName);
+                            if (result)
+                            {
+                                log.Info("Zip File sent: " + zipName);
+                                if (DeleteZipAndFiles(zipName))
+                                    log.Info("Zip " + zipName + " and Files deleted");
+                            }
+                            else
+                            {
+                                log.Info("Error sendig Zip File " + zipName);
+                            }
                         }
                         else
                         {
-                            log.Info("Error sendig Zip File " + zipName);
+                            log.Info("Exists " +  numFiles.ToString() + " files to send but remote Path " + RemoteFilesPath + " is not accesible");
                         }
                     }
                     else
@@ -253,6 +267,8 @@ namespace SpreadWorkDesktop
                     Percent = doc.DocumentElement.SelectSingleNode("/root/Percent").InnerText;
                 if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/Event").InnerText))
                     Event = doc.DocumentElement.SelectSingleNode("/root/Event").InnerText;
+                // Actualizar intervalo
+                TimerCaptura.Interval = Interval;
             }
             catch (Exception ex) {
                 log.Error("Error reading remote XML config file:  " + ex.Message);
@@ -317,6 +333,24 @@ namespace SpreadWorkDesktop
 
         }
 
+        private bool CheckRemoteFilesPath()
+        {
+            string DestPath = RemoteFilesPath;
+            // Crear directorio destino
+            try
+            {
+                if (Directory.Exists(DestPath))
+                    return true;
+                else
+                    return false;
+            }
+            catch (Exception ex)
+            {
+                log.Error("Can't acces destination folder for leaving zip file" + ex.Message);
+                return false;
+            }
+        }
+
         private bool SendZipFile(string zipName)
         {
             string DestPath = RemoteFilesPath + Event + "\\";
@@ -370,7 +404,7 @@ namespace SpreadWorkDesktop
             }
         }
 
-        private void DeleteZipAndFiles(string zipName)
+        private bool DeleteZipAndFiles(string zipName)
         {
             try
             {
@@ -383,12 +417,13 @@ namespace SpreadWorkDesktop
                 string OrigFilesPath = Path + "files\\";
                 if (Directory.GetFiles(OrigFilesPath).Length > 0)
                     Array.ForEach(Directory.GetFiles(OrigFilesPath), File.Delete);
-                // Log
-                log.Info("ZIP and files deleted");
+                // Debolver ok
+                return true;
             }
             catch (Exception ex)
             {
                 log.Error("Files sent can't be deleted: " + ex.Message);
+                return false;
             }
         }
 
