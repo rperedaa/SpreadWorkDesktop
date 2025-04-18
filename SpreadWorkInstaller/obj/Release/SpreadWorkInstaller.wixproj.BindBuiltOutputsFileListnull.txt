@@ -1,0 +1,2 @@
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkInstaller\bin\Release\SpreadWorkInstaller.msi
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkInstaller\bin\Release\SpreadWorkInstaller.wixpdb

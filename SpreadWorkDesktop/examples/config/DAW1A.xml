@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+ <root>
+     <Interval>10000</Interval>
+     <StartDateTime>18/04/2025 02:50:00</StartDateTime>
+     <EndDateTime>18/04/2025 02:55:00</EndDateTime>
+     <Width></Width>
+     <Height></Height>
+     <Percent>0,50</Percent>
+     <Event>EXAMENBD3EVA</Event>
+ </root>

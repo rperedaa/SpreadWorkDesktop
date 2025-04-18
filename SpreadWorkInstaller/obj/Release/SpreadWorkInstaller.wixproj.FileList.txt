@@ -1,0 +1,6 @@
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkInstaller\bin\Release\SpreadWorkInstaller.msi
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkInstaller\bin\Release\SpreadWorkInstaller.wixpdb
+obj\Release\Product.wixobj
+obj\Release\SpreadWorkInstaller.wixproj.BindContentsFileListnull.txt
+obj\Release\SpreadWorkInstaller.wixproj.BindOutputsFileListnull.txt
+obj\Release\SpreadWorkInstaller.wixproj.BindBuiltOutputsFileListnull.txt
