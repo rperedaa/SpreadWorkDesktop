@@ -46,7 +46,23 @@ namespace SpreadWorkDesktop
             SetRemoteConfig();
             this.MouseClick += delegate (object sender, MouseEventArgs e)
             {
+                log.Info("Program hide after click");
                 this.WindowState = FormWindowState.Minimized;
+                this.Hide();
+            };
+
+            this.Activated += delegate (object sender, System.EventArgs e)
+            {
+                log.Info("Program hide after activation");
+                this.WindowState = FormWindowState.Minimized;
+                this.Hide();
+            };
+
+            this.Load += delegate (object sender, System.EventArgs e)
+            {
+                log.Info("Program hide after load");
+                this.WindowState = FormWindowState.Minimized;
+                this.Hide();
             };
         }
 
