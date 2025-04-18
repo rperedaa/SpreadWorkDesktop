@@ -4,7 +4,7 @@
 		<Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" />
 
 		<MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-		<MediaTemplate />
+		<MediaTemplate EmbedCab="yes" />
 
 		<Feature Id="ProductFeature" Title="SpreadWorkInstaller" Level="1">
 			<ComponentGroupRef Id="ProductComponents" />
@@ -21,16 +21,24 @@
 
 	<Fragment>
 		<ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
-			<!-- TODO: Remove the comments around this Component element and the ComponentRef below in order to add resources to this installer. -->
-			<!-- <Component Id="ProductComponent"> -->
-				<!-- TODO: Insert files, registry keys, and other resources here. -->
-			<!-- </Component> -->
 			<Component Id="SpreadWorkDesktop.exe" Guid="34761165-8154-4074-b987-f42b56d9f068">
 			  <File Id="SpreadWorkDesktop.exe" Name="SpreadWorkDesktop.exe" Source="$(var.SpreadWorkDesktop_TargetDir)SpreadWorkDesktop.exe" />
 			</Component>
 			<Component Id="SpreadWorkDesktop.exe.config" Guid="6250fbf7-ecfb-414a-97f4-6a9095110610">
 			  <File Id="SpreadWorkDesktop.exe.config" Name="SpreadWorkDesktop.exe.config" Source="$(var.SpreadWorkDesktop_TargetDir)SpreadWorkDesktop.exe.config" />
 			</Component>
+			<Component Id="SpreadWorkDesktop.pdb" Guid="669093cf-ebbb-4d21-a806-ee337d591f2c">
+			  <File Id="SpreadWorkDesktop.pdb" Name="SpreadWorkDesktop.pdb" Source="$(var.SpreadWorkDesktop_TargetDir)SpreadWorkDesktop.pdb" />
+			</Component>
+			<Component Id="log4net.dll" Guid="4eca6592-1be6-4d42-b61a-9506b689a283">
+			  <File Id="log4net.dll" Name="log4net.dll" Source="$(var.SpreadWorkDesktop_TargetDir)log4net.dll" />
+			</Component>
+			<Component Id="RegistryEntries" Guid="B0A06192-89B4-4D23-B983-EDB18BCEE2C9">
+				<RegistryKey Root="HKLM" Key="Software\SpreadWorkCapture\Config">
+					<RegistryValue Type="string" Name="Group" Value="DAW1A" KeyPath="yes"/>
+				</RegistryKey>
+			</Component>
 		</ComponentGroup>
 	</Fragment>
+	
 </Wix>

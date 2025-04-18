@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Timers;
 using System.Drawing.Imaging;
 using System.IO;
-using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Collections.Specialized;
 using System.Configuration;
+using Microsoft.Win32;
+using System.Xml;
+
 
 namespace SpreadWorkDesktop
 {
@@ -33,24 +29,26 @@ namespace SpreadWorkDesktop
         int scaleWidth =1;
         int scaleHeight = 1;
         string Path;
-
-
-        
+        string RemoteConfigPath;
+        string RemoteFilesPath;
+        string Event;
+        private static log4net.ILog log; 
         public Form1()
         {
-            #if DEBUG
-            // System.Diagnostics.Debugger.Launch();
-            #endif
             InitializeComponent();
             this.WindowState = FormWindowState.Minimized;
             this.ShowInTaskbar = false;
             LoadProgramConfig();
             SetProgramConfig();
+            SetLogConfig();
+            SetRemoteConfig();
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-         // Ejecución períodica
+         // Escribe log
+         log.Info("SpreadWorkDesktop Program Started"); 
+         // Configurar Timer para ejecución períodica de capturas
         TimerCaptura.Elapsed += new ElapsedEventHandler(OnElapsedTimeForCapture);
         TimerCaptura.Interval = Interval;
         TimerCaptura.Enabled = true;
@@ -59,14 +57,16 @@ namespace SpreadWorkDesktop
     private void OnElapsedTimeForCapture(object sender, ElapsedEventArgs e)
     {
            // Escribe log
-           WriteLog("{0} ms elapsed."); 
-           // Detener Timer para hacer el proceso
+           log.Info("Capture check on " + Interval.ToString() + " ms elapsed."); 
+            // Detener Timer para hacer el proceso
            TimerCaptura.Enabled = false;
            // Si está en el periodo indicado en la configuración
            if (DateTime.Now >=StartDateTime && DateTime.Now <=EndDateTime)
             { 
+            log.Info("Time to take a screen capture configurated"); 
              if (String.IsNullOrWhiteSpace(PicWidth) && String.IsNullOrWhiteSpace(PicHeight) && String.IsNullOrWhiteSpace(Percent))
                 { 
+                 log.Info("Taking screen capture without resize"); 
                  // Captura imagen a tamaño real
                  Size size = GetDisplayResolution();
                  using (Bitmap bitmap = new Bitmap(size.Width, size.Height, PixelFormat.Format32bppArgb))
@@ -79,7 +79,8 @@ namespace SpreadWorkDesktop
                  }
              } else
              { 
-               // Aplicar reescalado 
+              log.Info("Taking screen capture with " + Percent + " scale"); 
+              // Aplicar reescalado 
               Size size = GetDisplayResolution();
                // Si Percent tiene valor se usa ese valor en lugar del Width y el Height. 
                // Pero los valores se hacen siempre en base a Width y Height
@@ -119,13 +120,14 @@ namespace SpreadWorkDesktop
                }
                }
              }
+            } 
+           else { 
+            log.Info("It's not time configurated to take a screen capture");
             }
-            // recargar configuración
-            LoadProgramConfig();
-            SetProgramConfig();
-
-        // Inicializa Timer
-        TimerCaptura.Enabled = true;
+            // Comprobar cambios remotos de configuración y aplicarlos
+            SetRemoteConfig();
+            // Inicializa Timer
+            TimerCaptura.Enabled = true;
 
     }
 
@@ -137,7 +139,7 @@ namespace SpreadWorkDesktop
         }
 
     private void SetProgramConfig() { 
-            // Establecer el intervalo
+            // Establecer valores cargados de App.Config
             Interval = Int32.Parse(cfgGlobal.Get("Interval"));
             StartDateTime = DateTime.Parse(cfgGlobal.Get("StartDateTime"));
             EndDateTime = DateTime.Parse(cfgGlobal.Get("EndDateTime"));
@@ -145,6 +147,72 @@ namespace SpreadWorkDesktop
             PicHeight =cfgGlobal.Get("Height");
             Percent =cfgGlobal.Get("Percent");
             Path= cfgGlobal.Get("Folder");
+            RemoteConfigPath = cfgGlobal.Get("RemoteConfigPath"); 
+            RemoteFilesPath = cfgGlobal.Get("RemoteFilesPath");
+            Event = cfgGlobal.Get("Event");
+        }
+
+        private void SetLogConfig()
+        {
+            string path = Path + "logs\\";
+            if (!Directory.Exists(path))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(path);
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+            string logFile = path + "\\SpreadWorkDesktopLog.log";
+            log4net.GlobalContext.Properties["LogFileName"] = logFile;
+            log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
+        }
+
+
+        private void SetRemoteConfig()
+        {
+            //Obtener Grupo del registro del 
+            string group = GetGroupFromRegistry();
+            if (group == "NONE")
+                log.Error("No group found in the register key ");
+            //Comprobar acceso a ruta remota de configuración
+             if (Directory.Exists(RemoteConfigPath))
+                {
+                LoadRemoteValues(RemoteConfigPath + "\\" + group + ".xml"); 
+                }
+                else {
+                    log.Error("No access to remote folder " + RemoteConfigPath);
+                }
+            }
+
+        private string GetGroupFromRegistry() {
+            // Ruta de la clave de registro
+            string regkeyname = @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\SpreadWorkCapture\Config";
+            string keyvalue = (string) Registry.GetValue(regkeyname, "Group", "NONE");
+            return keyvalue;
+        }
+
+        private void LoadRemoteValues(string xmlFile) {
+            XmlDocument doc = new XmlDocument();
+            try
+            {
+                doc.Load(xmlFile);
+                //Actualizar claves
+                if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/Interval").InnerText))
+                    Interval = Int32.Parse(doc.DocumentElement.SelectSingleNode("/root/Interval").InnerText);
+                if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/StartDateTime").InnerText))
+                    StartDateTime = DateTime.Parse(doc.DocumentElement.SelectSingleNode("/root/StartDateTime").InnerText);
+                if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/EndDateTime").InnerText))
+                    EndDateTime = DateTime.Parse(doc.DocumentElement.SelectSingleNode("/root/EndDateTime").InnerText);
+                if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/Width").InnerText))
+                    PicWidth = doc.DocumentElement.SelectSingleNode("/root/Width").InnerText;
+                if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/Height").InnerText))
+                    PicHeight = doc.DocumentElement.SelectSingleNode("/root/Height").InnerText;
+                if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/Percent").InnerText))
+                    Percent = doc.DocumentElement.SelectSingleNode("/root/Percent").InnerText;
+                if (!String.IsNullOrEmpty(doc.DocumentElement.SelectSingleNode("/root/Event").InnerText))
+                    Event = doc.DocumentElement.SelectSingleNode("/root/Event").InnerText;
+            }
+            catch (Exception ex) {
+                log.Error("Error reading remote XML config file:  " + ex.Message);
+            }
         }
 
         #endregion
@@ -164,46 +232,13 @@ namespace SpreadWorkDesktop
             var fechahora = DateTime.Now.ToString("ddMM_HHmm");
             var name = "pic" + horaunix +"_" +fechahora +".jpg";
             var file = path + name ;
-            bitmap.Save(file, System.Drawing.Imaging.ImageFormat.Jpeg);
+            try { 
+                bitmap.Save(file, System.Drawing.Imaging.ImageFormat.Jpeg);
+                }
+            catch(Exception e) {
+                log.Error("Error saving screen capture" + e.Message);
+            }
         }
-
-    #region Log 
-    private void WriteLog(string logMessage, bool addTimeStamp = true)
-    {
-       
-          try
-    {
-            
-        //var path = AppDomain.CurrentDomain.BaseDirectory;
-        var path = Path;
-        if (!Directory.Exists(path)) { 
-                DirectoryInfo di = Directory.CreateDirectory(path);
-                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
-         }
-
-        var filePath = String.Format("{0}\\{1}_{2}.txt",
-            path,
-            System.AppDomain.CurrentDomain.FriendlyName,
-            DateTime.Now.ToString("yyyyMMdd", CultureInfo.CurrentCulture)
-            );
-
-        if (addTimeStamp)
-            logMessage = String.Format("[{0}] - {1}",
-                DateTime.Now.ToString("HH:mm:ss", CultureInfo.CurrentCulture),
-                logMessage);
-
-        
-       File.AppendAllText(filePath, logMessage);
-     }
-    catch(Exception e)
-    {
-      // do nothing
-      WriteLog ("{0} exception writing log:" + e.ToString());
-    }
-    }
-
-        #endregion
-
 
         #region Display Resolution
 

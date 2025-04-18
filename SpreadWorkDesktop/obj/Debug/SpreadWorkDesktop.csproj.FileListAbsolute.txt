@@ -1,9 +1,14 @@
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.exe.config
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.exe
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\SpreadWorkDesktop.pdb
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\log4net.dll
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\log4net.pdb
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Debug\log4net.xml
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.Form1.resources
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.Properties.Resources.resources
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.GenerateResource.cache
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.CoreCompileInputs.cache
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.CopyComplete
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.exe
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.pdb
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.AssemblyReference.cache
