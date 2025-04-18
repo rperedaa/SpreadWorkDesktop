@@ -34,8 +34,11 @@
 			  <File Id="log4net.dll" Name="log4net.dll" Source="$(var.SpreadWorkDesktop_TargetDir)log4net.dll" />
 			</Component>
 			<Component Id="RegistryEntries" Guid="B0A06192-89B4-4D23-B983-EDB18BCEE2C9">
-				<RegistryKey Root="HKLM" Key="Software\SpreadWorkCapture\Config">
+				<RegistryKey Root="HKLM" Key="Software\SpreadWork\Config">
 					<RegistryValue Type="string" Name="Group" Value="DAW1A" KeyPath="yes"/>
+					<RegistryValue Type="string" Name="Folder" Value="C:\$SpreadWork\" />
+					<RegistryValue Type="string" Name="RemoteConfigPath" Value="\\w7pro\fotos\config\" />
+					<RegistryValue Type="string" Name="RemoteFilesPath" Value="\\w7pro\fotos\files\" />
 				</RegistryKey>
 			</Component>
 		</ComponentGroup>

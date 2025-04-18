@@ -7,3 +7,7 @@ C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Release\Sp
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Release\SpreadWorkDesktop.csproj.CoreCompileInputs.cache
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Release\SpreadWorkDesktop.exe
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Release\SpreadWorkDesktop.pdb
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Release\log4net.dll
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Release\log4net.pdb
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\bin\Release\log4net.xml
+C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Release\SpreadWorkDesktop.csproj.CopyComplete

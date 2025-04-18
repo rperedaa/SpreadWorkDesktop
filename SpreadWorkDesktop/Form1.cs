@@ -10,11 +10,12 @@ using System.Collections.Specialized;
 using System.Configuration;
 using Microsoft.Win32;
 using System.Xml;
+using System.IO.Compression;
+using System.Security.Cryptography;
 
 
 namespace SpreadWorkDesktop
 {
-    
     public partial class Form1 : Form
     {
         private NameValueCollection cfgGlobal;
@@ -40,6 +41,7 @@ namespace SpreadWorkDesktop
             this.ShowInTaskbar = false;
             LoadProgramConfig();
             SetProgramConfig();
+            LoadRegisterConfig();
             SetLogConfig();
             SetRemoteConfig();
         }
@@ -54,8 +56,8 @@ namespace SpreadWorkDesktop
         TimerCaptura.Enabled = true;
         }
 
-    private void OnElapsedTimeForCapture(object sender, ElapsedEventArgs e)
-    {
+        private void OnElapsedTimeForCapture(object sender, ElapsedEventArgs e)
+        {
            // Escribe log
            log.Info("Capture check on " + Interval.ToString() + " ms elapsed."); 
             // Detener Timer para hacer el proceso
@@ -123,13 +125,38 @@ namespace SpreadWorkDesktop
             } 
            else { 
             log.Info("It's not time configurated to take a screen capture");
+                // Comprobar si hay que enviar datos 
+                // Si se sobrepasan las fechas de comienzo y fin
+                if (DateTime.Now > StartDateTime && DateTime.Now > EndDateTime){
+                    // Si hay datos en el directorio local 
+                    int numFiles = CheckForFilesToSend();
+                    if (numFiles != 0)
+                    {
+                        log.Info("Preparing files to Send: " + numFiles.ToString());
+                        string zipName = GetZipFileName();
+                        CreateZipFile(zipName);
+                        bool result = SendZipFile(zipName);
+                        if (result)
+                        {
+                            DeleteZipAndFiles(zipName);
+                            log.Info("Zip File sent: " + zipName);
+                        }
+                        else
+                        {
+                            log.Info("Error sendig Zip File " + zipName);
+                        }
+                    }
+                    else
+                        log.Info("No files pending to send");
+                }
+
             }
             // Comprobar cambios remotos de configuración y aplicarlos
             SetRemoteConfig();
             // Inicializa Timer
             TimerCaptura.Enabled = true;
 
-    }
+        }
 
         #region Configuration
     private void LoadProgramConfig() { 
@@ -146,10 +173,27 @@ namespace SpreadWorkDesktop
             PicWidth = cfgGlobal.Get("Width");
             PicHeight =cfgGlobal.Get("Height");
             Percent =cfgGlobal.Get("Percent");
-            Path= cfgGlobal.Get("Folder");
-            RemoteConfigPath = cfgGlobal.Get("RemoteConfigPath"); 
-            RemoteFilesPath = cfgGlobal.Get("RemoteFilesPath");
             Event = cfgGlobal.Get("Event");
+        }
+
+        private void LoadRegisterConfig() {
+            Path = GetKeyFromRegistry("Folder");
+            RemoteConfigPath = GetKeyFromRegistry("RemoteConfigPath");
+            RemoteFilesPath = GetKeyFromRegistry("RemoteFilesPath");
+            // Si no existe crearlo oculto
+            try
+            {
+                if (!Directory.Exists(Path))
+                {
+                    DirectoryInfo di = Directory.CreateDirectory(Path);
+                    di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error("Error creation local path " + Path + " - " + ex.Message);
+            }
+                    
         }
 
         private void SetLogConfig()
@@ -169,7 +213,7 @@ namespace SpreadWorkDesktop
         private void SetRemoteConfig()
         {
             //Obtener Grupo del registro del 
-            string group = GetGroupFromRegistry();
+            string group = GetKeyFromRegistry("Group");
             if (group == "NONE")
                 log.Error("No group found in the register key ");
             //Comprobar acceso a ruta remota de configuración
@@ -182,10 +226,10 @@ namespace SpreadWorkDesktop
                 }
             }
 
-        private string GetGroupFromRegistry() {
+        private string GetKeyFromRegistry(string regkey) {
             // Ruta de la clave de registro
-            string regkeyname = @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\SpreadWorkCapture\Config";
-            string keyvalue = (string) Registry.GetValue(regkeyname, "Group", "NONE");
+            string regkeyname = @"HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\SpreadWork\Config";
+            string keyvalue = (string) Registry.GetValue(regkeyname, regkey, "NONE");
             return keyvalue;
         }
 
@@ -217,6 +261,141 @@ namespace SpreadWorkDesktop
 
         #endregion
 
+        #region file sending
+        private int CheckForFilesToSend() {
+            string directorio = Path + "files\\"; 
+            DirectoryInfo directorioInfo = new DirectoryInfo(directorio);
+            if (directorioInfo.Exists)
+            {
+                FileInfo[] archivos = directorioInfo.GetFiles();
+                if (archivos.Length > 0)
+                    return archivos.Length;
+                else
+                    return 0;
+            }
+            else
+            {
+                Console.WriteLine("El directorio no existe.");
+                return 0;
+            }
+        }
+
+        private string GetZipFileName() {
+            // Obtener nombre de cuenta logeada en el equipo. 
+            string userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+            int pos = userName.IndexOf('\\');
+            userName =  pos != -1 ? userName.Substring(pos + 1) : userName;
+            // Obtener nombre del equipo (hostname)
+            string hostName = System.Windows.Forms.SystemInformation.ComputerName;
+            // Concatenar con fecha 
+            string fecha = DateTime.Now.ToString("ddMMyyyy");
+            // Añadir Random de 1 a 1000
+            Random random = new Random();
+            string rString = random.Next(0, 1000).ToString();
+            return (userName + "_" + hostName+"_"+fecha+"_"+ rString);
+        }
+
+        private void CreateZipFile(string zipName) {
+            string OrigPath = Path + "files\\";
+            string DestPath = Path + "tmp\\";
+            string DestFile = DestPath + zipName + ".zip";
+            
+            // Crear directorio temporal para el fichero .zip si no existe
+            if (!Directory.Exists(DestPath))
+            {
+                DirectoryInfo di = Directory.CreateDirectory(DestPath);
+                di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
+            }
+            // Comprimir el contenido de Path\files
+            try
+            {
+                ZipFile.CreateFromDirectory(OrigPath, DestFile, CompressionLevel.Fastest, false);
+            }
+            catch (Exception ex) {
+                log.Error("Error creating zip file: " + ex.Message);
+            }
+
+        }
+
+        private bool SendZipFile(string zipName)
+        {
+            string DestPath = RemoteFilesPath + Event + "\\";
+            // Crear directorio destino
+            try
+            {
+                if (!Directory.Exists(DestPath))
+                    Directory.CreateDirectory(DestPath);
+            }
+            catch (Exception ex)
+            {
+                log.Error("Can't create destination folder for zip file" + ex.Message);
+                return false;
+            }
+            // Enviar fichero 
+            string OrigPath = Path + "tmp\\";
+            string OrigFile = OrigPath + zipName + ".zip";
+            string DestFile = DestPath  + zipName + ".zip";
+            try {
+                File.Copy(OrigFile, DestFile, true);
+            }
+            catch (Exception ex)
+            {
+                log.Error("Can't send zip file to destination folder: " + ex.Message);
+                return false;
+            }
+            // Comprobar que ha llegado usando MD5 Hash
+            string origFileMD5 = getMD5(OrigFile);
+            string destFileMD5 = getMD5(DestFile);
+            if (!string.IsNullOrEmpty(origFileMD5) && !string.IsNullOrEmpty(destFileMD5) && (origFileMD5 == destFileMD5))
+                return true;
+            else
+                return false;
+        }
+
+        private string getMD5(string filePath) {
+            try
+            {
+                using (var md5 = MD5.Create())
+                {
+                    using (var stream = File.OpenRead(filePath))
+                    {
+                        var hash = md5.ComputeHash(stream);
+                        return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+                    }
+                }
+            }
+            catch (Exception ex) {
+                log.Error("Error calculating MD5 for file " + filePath + " - " + ex.Message);
+                return string.Empty;
+            }
+        }
+
+        private void DeleteZipAndFiles(string zipName)
+        {
+            try
+            {
+                // Borrar el fichero zip en el path local 
+                string OrigZipPath = Path + "tmp\\";
+                string OrigZipFile = OrigZipPath + zipName + ".zip";
+                if (File.Exists(OrigZipFile))
+                    File.Delete(OrigZipFile);
+                // Borrar el contenido del directorio files
+                string OrigFilesPath = Path + "files\\";
+                if (Directory.GetFiles(OrigFilesPath).Length > 0)
+                    Array.ForEach(Directory.GetFiles(OrigFilesPath), File.Delete);
+                // Log
+                log.Info("ZIP and files deleted");
+            }
+            catch (Exception ex)
+            {
+                log.Error("Files sent can't be deleted: " + ex.Message);
+            }
+        }
+
+
+        #endregion
+
+        #region Save captures
         private void SaveScreen(Bitmap bitmap)
         {
             // Crear directirio para guardar fotos si no existe
@@ -239,6 +418,8 @@ namespace SpreadWorkDesktop
                 log.Error("Error saving screen capture" + e.Message);
             }
         }
+
+        #endregion
 
         #region Display Resolution
 

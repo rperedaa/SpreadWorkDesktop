@@ -11,4 +11,3 @@ C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\Spre
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.CopyComplete
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.exe
 C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.pdb
-C:\Users\roberto\Source\Repos\SpreadWorkDesktop\SpreadWorkDesktop\obj\Debug\SpreadWorkDesktop.csproj.AssemblyReference.cache
